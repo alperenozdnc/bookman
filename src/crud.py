@@ -65,8 +65,6 @@ def add() -> None:
     
     if info["status"] == "done":
         table.add_column("Rating", style="magenta")
-
-    if info["status"] == "done":
         table.add_row(
             info["title"],
             info["author"],
@@ -83,8 +81,6 @@ def add() -> None:
             info["isbn"],
             info["status"]
         )
-
-
 
     console = Console()
     console.print(table)
