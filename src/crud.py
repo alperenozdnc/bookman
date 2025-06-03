@@ -93,16 +93,7 @@ def add() -> None:
 
         console.print(table)
 
-        is_info_correct = input("\nIs the information correct? [y/n] ")
-
-        if (
-            is_info_correct == "n" or 
-            is_info_correct == "N" or 
-            is_info_correct == "no"
-        ):
-            continue
-
-        is_input_valid = True
+        is_input_valid = click.confirm("Is the information correct? ")
 
         with open(os.path.join(const.data_dir, f"{info["isbn"]}.json"), "w") as file:
             json_data = json.dumps(info)
