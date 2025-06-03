@@ -1,3 +1,5 @@
+import os
+import json
 import click
 
 from rich.console import Console
@@ -5,6 +7,8 @@ from rich.table import Table
 
 @click.command(help="Add a book with properties like its rating, author, pages, etc.")
 def add() -> None:
+    console = Console()
+
     info = {
         "title": "",
         "author": "",
@@ -53,34 +57,65 @@ def add() -> None:
         if info["status"] == "done":
             info["rating"] = input("Rating (x/10): ")
 
-    table = Table(title="Book Information")
 
-    acquire_input()
+    is_input_valid = False
 
-    table.add_column("Title", style="cyan", no_wrap=True)
-    table.add_column("Author", style="magenta")
-    table.add_column("Pages", style="cyan")
-    table.add_column("ISBN", style="magenta", no_wrap=True)
-    table.add_column("Status", style="cyan")
-    
-    if info["status"] == "done":
-        table.add_column("Rating", style="magenta")
-        table.add_row(
-            info["title"],
-            info["author"],
-            info["pages"],
-            info["isbn"],
-            info["status"],
-            info["rating"]
-        )
-    else:
-        table.add_row(
-            info["title"],
-            info["author"],
-            info["pages"],
-            info["isbn"],
-            info["status"]
-        )
+    while not is_input_valid:
+        table = Table(title="Book Information")
 
-    console = Console()
-    console.print(table)
+        acquire_input()
+
+        table.add_column("Title", style="cyan", no_wrap=True)
+        table.add_column("Author", style="magenta")
+        table.add_column("Pages", style="cyan")
+        table.add_column("ISBN", style="magenta", no_wrap=True)
+        table.add_column("Status", style="cyan")
+        
+        if info["status"] == "done":
+            table.add_column("Rating", style="magenta")
+            table.add_row(
+                info["title"],
+                info["author"],
+                info["pages"],
+                info["isbn"],
+                info["status"],
+                info["rating"]
+            )
+        else:
+            table.add_row(
+                info["title"],
+                info["author"],
+                info["pages"],
+                info["isbn"],
+                info["status"]
+            )
+
+        console.print(table)
+
+        is_info_correct = input("\nIs the information correct? [y/n] ")
+
+        if (
+            is_info_correct == "n" or 
+            is_info_correct == "N" or 
+            is_info_correct == "no"
+        ):
+            continue
+
+        is_input_valid = True
+
+        local_dir = os.path.join(os.path.expanduser("~"), ".local")
+        data_dir = os.path.join(local_dir, "bookman")
+
+        try:
+            os.mkdir(data_dir)
+        except FileExistsError:
+            pass
+        except PermissionError:
+            print(f"Permission denied: Unable to create '{data_dir}'.")
+        except Exception as e:
+            print(f"An error occurred trying to create data directory: {e}")
+
+        with open(os.path.join(data_dir, f"{info["isbn"]}.json"), "w") as file:
+            json_data = json.dumps(info)
+
+            file.write(json_data)
