@@ -1,6 +1,7 @@
 import os
 import json
 import click
+import const
 
 from rich.console import Console
 from rich.table import Table
@@ -103,19 +104,7 @@ def add() -> None:
 
         is_input_valid = True
 
-        local_dir = os.path.join(os.path.expanduser("~"), ".local")
-        data_dir = os.path.join(local_dir, "bookman")
-
-        try:
-            os.mkdir(data_dir)
-        except FileExistsError:
-            pass
-        except PermissionError:
-            print(f"Permission denied: Unable to create '{data_dir}'.")
-        except Exception as e:
-            print(f"An error occurred trying to create data directory: {e}")
-
-        with open(os.path.join(data_dir, f"{info["isbn"]}.json"), "w") as file:
+        with open(os.path.join(const.data_dir, f"{info["isbn"]}.json"), "w") as file:
             json_data = json.dumps(info)
 
             file.write(json_data)
