@@ -2,6 +2,7 @@ import os
 import json
 import click
 import const
+import inquirer 
 
 from rich.console import Console
 from rich.table import Table
@@ -100,7 +101,37 @@ def add() -> None:
 
             file.write(json_data)
 
+
 @click.command(help="Lists all the recorded books and allows you to delete one.")
 @click.argument("isbn", required=False)
 def delete(isbn: str) -> None:
-    console.print(isbn)
+    selected = None
+    path_to_delete = ""
+
+    if not isbn:
+        book_titles = []
+
+        for filename in os.listdir(const.data_dir):
+            isbn = filename.split(".")[0]
+
+            with open(os.path.join(const.data_dir, f"{isbn}.json"), "r") as file:
+                json_data = json.load(file)
+
+                book_titles.append(json_data["title"])
+
+        answer = inquirer.prompt([
+            inquirer.List(
+                "selected",
+                message="What book to delete?",
+                choices=book_titles
+            ),
+        ])
+
+        selected = answer["selected"]
+        book_idx = book_titles.index(selected)
+
+        path_to_delete = os.path.join(const.data_dir, [filename for filename in os.listdir(const.data_dir)][book_idx])
+    else:
+        path_to_delete = os.path.join(const.data_dir, f"{isbn}.json")
+
+    os.remove(path_to_delete)
