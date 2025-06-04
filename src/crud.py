@@ -6,10 +6,10 @@ import const
 from rich.console import Console
 from rich.table import Table
 
+console = Console()
+
 @click.command(help="Add a book with properties like its rating, author, pages, etc.")
 def add() -> None:
-    console = Console()
-
     info = {
         "title": "",
         "author": "",
@@ -99,3 +99,8 @@ def add() -> None:
             json_data = json.dumps(info)
 
             file.write(json_data)
+
+@click.command(help="Lists all the recorded books and allows you to delete one.")
+@click.argument("isbn", required=False)
+def delete(isbn: str) -> None:
+    console.print(isbn)

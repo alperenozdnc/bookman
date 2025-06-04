@@ -15,7 +15,8 @@ def cli() -> None:
     except Exception as e:
         print(f"An error occurred trying to create data directory: {e}")
 
-cli.add_command(crud.add);
+cli.add_command(crud.add)
+cli.add_command(crud.delete)
 
 if __name__ == "__main__":
     cli()
