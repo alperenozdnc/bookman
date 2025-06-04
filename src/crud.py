@@ -106,7 +106,7 @@ def add() -> None:
 @click.argument("isbn", required=False)
 def delete(isbn: str) -> None:
     selected = None
-    path_to_delete = ""
+    filename_to_delete = ""
 
     if not isbn:
         book_titles = []
@@ -135,8 +135,8 @@ def delete(isbn: str) -> None:
 
         book_idx = book_titles.index(selected)
 
-        path_to_delete = os.path.join(const.data_dir, [filename for filename in os.listdir(const.data_dir)][book_idx])
+        filename_to_delete = [filename for filename in os.listdir(const.data_dir)][book_idx]
     else:
-        path_to_delete = os.path.join(const.data_dir, f"{isbn}.json")
+        filename_to_delete = f"{isbn}.json"
 
-    os.remove(path_to_delete)
+    os.remove(os.path.join(const.data_dir, filename_to_delete))
