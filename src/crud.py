@@ -138,3 +138,4 @@ def delete(isbn: str) -> None:
         filename_to_delete = f"{isbn}.json"
 
     os.remove(os.path.join(const.data_dir, filename_to_delete))
+    print(f"Successfully deleted book.")
