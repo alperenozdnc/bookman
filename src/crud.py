@@ -123,11 +123,16 @@ def delete(isbn: str) -> None:
             inquirer.List(
                 "selected",
                 message="What book to delete?",
-                choices=book_titles
+                choices=[*book_titles, "Cancel"]
             ),
         ])
 
         selected = answer["selected"]
+
+        if selected == "Cancel":
+            print("Aborting...")
+            return
+
         book_idx = book_titles.index(selected)
 
         path_to_delete = os.path.join(const.data_dir, [filename for filename in os.listdir(const.data_dir)][book_idx])
