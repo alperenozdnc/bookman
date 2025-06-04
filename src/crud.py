@@ -127,14 +127,12 @@ def delete(isbn: str) -> None:
             ),
         ])
 
-        selected = answer["selected"]
-
-        if selected == "Cancel":
+        if answer is None or answer["selected"] == "Cancel":
             print("Aborting...")
             return
 
+        selected = answer["selected"]
         book_idx = book_titles.index(selected)
-
         filename_to_delete = [filename for filename in os.listdir(const.data_dir)][book_idx]
     else:
         filename_to_delete = f"{isbn}.json"
