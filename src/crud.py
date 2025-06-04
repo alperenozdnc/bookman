@@ -139,3 +139,8 @@ def delete(isbn: str) -> None:
 
     os.remove(os.path.join(const.data_dir, filename_to_delete))
     print(f"Successfully deleted book.")
+
+
+@click.command(help="Lists all recorded books.")
+def list() -> None:
+    print("list")
