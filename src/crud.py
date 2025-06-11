@@ -142,5 +142,53 @@ def delete(isbn: str) -> None:
 
 
 @click.command(help="Lists all recorded books.")
-def list() -> None:
-    print("list")
+@click.argument("isbn", required=False)
+def list(isbn: str) -> None:
+    if not isbn:
+        book_titles = []
+
+        for filename in os.listdir(const.data_dir):
+            isbn = filename.split(".")[0]
+
+            with open(os.path.join(const.data_dir, f"{isbn}.json"), "r") as file:
+                json_data = json.load(file)
+
+                book_titles.append(json_data["title"])
+
+        answer = inquirer.prompt([
+            inquirer.List(
+                "selected",
+                message="What book to view?",
+                choices=[*book_titles, "Cancel"]
+            ),
+        ])
+
+        if answer is None or answer["selected"] == "Cancel":
+            print("Aborting...")
+            return
+
+        selected = answer["selected"]
+        book_idx = book_titles.index(selected)
+        filename_to_view = [filename for filename in os.listdir(const.data_dir)][book_idx]
+    else:
+        filename_to_view = f"{isbn}.json"
+
+    properties = ["title", "author", "pages", "isbn", "status", "rating"]
+
+    info = {
+        "title": "",
+        "author": "",
+        "pages": None,
+        "isbn": None,
+        "status": None,
+        "rating": None
+    };
+
+    with open(os.path.join(const.data_dir, filename_to_view), "r") as file:
+        json_data = json.load(file)
+
+        for property in properties:
+            info[property] = json_data[property]
+
+    print(info)
+
