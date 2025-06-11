@@ -132,7 +132,6 @@ def delete(isbn: str) -> None:
 @click.argument("isbn", required=False)
 def list(isbn: str) -> None:
     is_user_done = False
-    is_user_setting_rating = False
     info = dict(zip(properties, len(properties) * ""))
 
     while not is_user_done:
