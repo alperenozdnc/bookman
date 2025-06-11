@@ -131,14 +131,73 @@ def delete(isbn: str) -> None:
 @click.command(help="Lists all recorded books.")
 @click.argument("isbn", required=False)
 def list(isbn: str) -> None:
-    filename_to_view = f"{isbn}.json" if isbn else query_books("What book to view?")
+    is_user_done = False
+    is_user_setting_rating = False
     info = dict(zip(properties, len(properties) * ""))
 
-    with open(os.path.join(const.data_dir, filename_to_view), "r") as file:
-        json_data = json.load(file)
+    while not is_user_done:
+        os.system("clear")
+        filename_to_view = f"{isbn}.json" if isbn else query_books("What book to view?")
 
-        for property in properties:
-            info[property] = json_data[property]
+        with open(os.path.join(const.data_dir, filename_to_view), "r") as file:
+            json_data = json.load(file)
 
-    print_book_info(info)
+            for property in properties:
+                info[property] = json_data[property]
 
+        os.system("clear")
+        print_book_info(info)
+
+        answer = inquirer.prompt([
+            inquirer.List(
+                "selected",
+                message="What do you want to do?",
+                choices=[*filter(None, ["Change status", "Delete", "Set rating" if info["status"] == "done" else None, "Go back to menu"])]
+            )
+        ])
+
+        if answer is None:
+            continue
+
+        selected = answer["selected"]
+
+        if selected == "Delete":
+            os.remove(os.path.join(const.data_dir, filename_to_view))
+
+            print(f"Successfully deleted book.")
+        elif selected == "Change status":
+            answer_status = inquirer.prompt([
+                inquirer.List(
+                    "selected",
+                    message="Set status",
+                    choices=[
+                        *filter(
+                            None,
+                            [status if status.lower() != info["status"] else None for status in ["Done", "Reading", "Want to read"]
+                        ]), "Cancel"
+                    ]
+                ),
+            ])
+
+            if answer_status is None:
+                continue
+
+            selected_status: str = answer_status["selected"].lower()
+
+            if selected_status == "cancel":
+                continue
+
+            info["status"] = selected_status
+
+            with open(os.path.join(const.data_dir, filename_to_view), "w") as file:
+                file.write(json.dumps(info))
+        elif selected == "Set rating":
+            rating = input("What's the rating out of 10? ")
+            info["rating"] = rating
+
+            with open(os.path.join(const.data_dir, filename_to_view), "w") as file:
+                file.write(json.dumps(info))
+        else:
+            continue
+
+        is_user_done = True
