@@ -38,6 +38,37 @@ def query_books(question: str) -> str:
 
     return [filename for filename in os.listdir(const.data_dir)][book_idx]
 
+def print_book_info(info) -> None:
+    table = Table(title="Book Information")
+
+    table.add_column("Title", style="cyan", no_wrap=True)
+    table.add_column("Author", style="magenta")
+    table.add_column("Pages", style="cyan")
+    table.add_column("ISBN", style="magenta", no_wrap=True)
+    table.add_column("Status", style="cyan")
+    
+    if info["status"] == "done":
+        table.add_column("Rating", style="magenta")
+
+        table.add_row(
+            info["title"],
+            info["author"],
+            info["pages"],
+            info["isbn"],
+            info["status"],
+            info["rating"]
+        )
+    else:
+        table.add_row(
+            info["title"],
+            info["author"],
+            info["pages"],
+            info["isbn"],
+            info["status"]
+        )
+
+    console.print(table)
+
 @click.command(help="Add a book with properties like its rating, author, pages, etc.")
 def add() -> None:
     info = {
@@ -92,36 +123,9 @@ def add() -> None:
     is_input_valid = False
 
     while not is_input_valid:
-        table = Table(title="Book Information")
-
         acquire_input()
-
-        table.add_column("Title", style="cyan", no_wrap=True)
-        table.add_column("Author", style="magenta")
-        table.add_column("Pages", style="cyan")
-        table.add_column("ISBN", style="magenta", no_wrap=True)
-        table.add_column("Status", style="cyan")
-        
-        if info["status"] == "done":
-            table.add_column("Rating", style="magenta")
-            table.add_row(
-                info["title"],
-                info["author"],
-                info["pages"],
-                info["isbn"],
-                info["status"],
-                info["rating"]
-            )
-        else:
-            table.add_row(
-                info["title"],
-                info["author"],
-                info["pages"],
-                info["isbn"],
-                info["status"]
-            )
-
-        console.print(table)
+    
+        print_book_info(info)
 
         is_input_valid = click.confirm("Is the information correct? ")
 
@@ -162,5 +166,5 @@ def list(isbn: str) -> None:
         for property in properties:
             info[property] = json_data[property]
 
-    print(info)
+    print_book_info(info)
 
