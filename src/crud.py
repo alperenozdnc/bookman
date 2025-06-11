@@ -9,6 +9,35 @@ from rich.table import Table
 
 console = Console()
 
+# Lists all books and asks for the user to pick one to do an action
+def query_books(question: str) -> str:
+    book_titles = []
+
+    for filename in os.listdir(const.data_dir):
+        isbn = filename.split(".")[0]
+
+        with open(os.path.join(const.data_dir, f"{isbn}.json"), "r") as file:
+            json_data = json.load(file)
+
+            book_titles.append(json_data["title"])
+
+    answer = inquirer.prompt([
+        inquirer.List(
+            "selected",
+            message=question,
+            choices=[*book_titles, "Cancel"]
+        ),
+    ])
+
+    if answer is None or answer["selected"] == "Cancel":
+        print("Aborting...")
+        exit()
+
+    selected = answer["selected"]
+    book_idx = book_titles.index(selected)
+
+    return [filename for filename in os.listdir(const.data_dir)][book_idx]
+
 @click.command(help="Add a book with properties like its rating, author, pages, etc.")
 def add() -> None:
     info = {
@@ -105,74 +134,17 @@ def add() -> None:
 @click.command(help="Lists all the recorded books and allows you to delete one.")
 @click.argument("isbn", required=False)
 def delete(isbn: str) -> None:
-    selected = None
-    filename_to_delete = ""
-
-    if not isbn:
-        book_titles = []
-
-        for filename in os.listdir(const.data_dir):
-            isbn = filename.split(".")[0]
-
-            with open(os.path.join(const.data_dir, f"{isbn}.json"), "r") as file:
-                json_data = json.load(file)
-
-                book_titles.append(json_data["title"])
-
-        answer = inquirer.prompt([
-            inquirer.List(
-                "selected",
-                message="What book to delete?",
-                choices=[*book_titles, "Cancel"]
-            ),
-        ])
-
-        if answer is None or answer["selected"] == "Cancel":
-            print("Aborting...")
-            return
-
-        selected = answer["selected"]
-        book_idx = book_titles.index(selected)
-        filename_to_delete = [filename for filename in os.listdir(const.data_dir)][book_idx]
-    else:
-        filename_to_delete = f"{isbn}.json"
+    filename_to_delete = f"{isbn}.json" if isbn else query_books("What book to delete?")
 
     os.remove(os.path.join(const.data_dir, filename_to_delete))
+
     print(f"Successfully deleted book.")
 
 
 @click.command(help="Lists all recorded books.")
 @click.argument("isbn", required=False)
 def list(isbn: str) -> None:
-    if not isbn:
-        book_titles = []
-
-        for filename in os.listdir(const.data_dir):
-            isbn = filename.split(".")[0]
-
-            with open(os.path.join(const.data_dir, f"{isbn}.json"), "r") as file:
-                json_data = json.load(file)
-
-                book_titles.append(json_data["title"])
-
-        answer = inquirer.prompt([
-            inquirer.List(
-                "selected",
-                message="What book to view?",
-                choices=[*book_titles, "Cancel"]
-            ),
-        ])
-
-        if answer is None or answer["selected"] == "Cancel":
-            print("Aborting...")
-            return
-
-        selected = answer["selected"]
-        book_idx = book_titles.index(selected)
-        filename_to_view = [filename for filename in os.listdir(const.data_dir)][book_idx]
-    else:
-        filename_to_view = f"{isbn}.json"
-
+    filename_to_view = f"{isbn}.json" if isbn else query_books("What book to view?")
     properties = ["title", "author", "pages", "isbn", "status", "rating"]
 
     info = {
