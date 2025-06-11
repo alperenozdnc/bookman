@@ -8,6 +8,7 @@ from rich.console import Console
 from rich.table import Table
 
 console = Console()
+properties = ["title", "author", "pages", "isbn", "status", "rating"]
 
 # Lists all books and asks for the user to pick one to do an action
 def query_books(question: str) -> str:
@@ -41,44 +42,26 @@ def query_books(question: str) -> str:
 def print_book_info(info) -> None:
     table = Table(title="Book Information")
 
-    table.add_column("Title", style="cyan", no_wrap=True)
-    table.add_column("Author", style="magenta")
-    table.add_column("Pages", style="cyan")
-    table.add_column("ISBN", style="magenta", no_wrap=True)
-    table.add_column("Status", style="cyan")
+    for idx, property in enumerate(properties):
+        if info["status"] != "done" and property == "rating":
+            continue
+
+        table.add_column(property.capitalize(), style=f"{"cyan" if idx % 2 == 0 else "magenta"}")
     
     if info["status"] == "done":
-        table.add_column("Rating", style="magenta")
-
         table.add_row(
-            info["title"],
-            info["author"],
-            info["pages"],
-            info["isbn"],
-            info["status"],
-            info["rating"]
+            *[info[key] for key in info.keys()]
         )
     else:
         table.add_row(
-            info["title"],
-            info["author"],
-            info["pages"],
-            info["isbn"],
-            info["status"]
+            *(filter(None, [info[key] if key != "rating" else None for key in info.keys()]))
         )
 
     console.print(table)
 
 @click.command(help="Add a book with properties like its rating, author, pages, etc.")
 def add() -> None:
-    info = {
-        "title": "",
-        "author": "",
-        "pages": None,
-        "isbn": None,
-        "status": None,
-        "rating": None
-    };
+    info = dict(zip(properties, len(properties) * ""))
 
     def acquire_input() -> None:
         is_isbn_valid = False
@@ -149,16 +132,7 @@ def delete(isbn: str) -> None:
 @click.argument("isbn", required=False)
 def list(isbn: str) -> None:
     filename_to_view = f"{isbn}.json" if isbn else query_books("What book to view?")
-    properties = ["title", "author", "pages", "isbn", "status", "rating"]
-
-    info = {
-        "title": "",
-        "author": "",
-        "pages": None,
-        "isbn": None,
-        "status": None,
-        "rating": None
-    };
+    info = dict(zip(properties, len(properties) * ""))
 
     with open(os.path.join(const.data_dir, filename_to_view), "r") as file:
         json_data = json.load(file)
