@@ -200,3 +200,12 @@ def list(isbn: str) -> None:
             continue
 
         is_user_done = True
+
+@click.command(help="Cleans all recorded books.")
+def clean() -> None:
+    book_files = os.listdir(const.data_dir)
+
+    for file in book_files:
+        os.remove(os.path.join(const.data_dir, file))
+
+    print("All data cleaned successfully.")
