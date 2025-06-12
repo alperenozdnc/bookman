@@ -222,7 +222,7 @@ def list(isbn: str) -> None:
 
     while not is_user_done:
         is_data_manipulated = False
-        info = dict(zip(properties, ["" for _ in range(0, len(properties) - 1)]))
+        info = dict(zip(properties, [""] * len(properties)))
         os.system("clear")
         filename_to_view = f"{isbn}.json" if isbn else query_books("What book to view?")
 
