@@ -222,8 +222,6 @@ def list(isbn: str) -> None:
         os.system("clear")
         filename_to_view = f"{isbn}.json" if isbn else query_books("What book to view?")
 
-        print(info)
-
         with open(os.path.join(const.data_dir, filename_to_view), "r") as file:
             json_data = json.load(file)
 
