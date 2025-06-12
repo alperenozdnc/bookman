@@ -10,6 +10,39 @@ from rich.table import Table
 console = Console()
 properties = ["title", "author", "pages", "isbn", "status", "rating"]
 
+def validate_isbn(isbn: str) -> bool:
+    is_valid = False
+
+    for i in range(0, len(isbn)):
+        c = isbn[i]
+
+        if not c.isdigit() and c != "-":
+            print(f"{c} is not allowed. Try again.")
+            return False
+
+        if c == "-":
+            if i == 0 or i == len(isbn) - 1:
+                print("ISBN can't start or end with a dash. Please try again.")
+                return False
+
+        if c == "-" and isbn[i + 1] == "-":
+            print("Two dashes can't be next to eachother. Please try again.")
+            return False
+
+
+    isbn_numbers = isbn.split("-")
+    isbn_len = 0
+
+    for num in isbn_numbers:
+        isbn_len += len(num)
+
+    if isbn_len == 13:
+        is_valid = True
+    else:
+        print("ISBN has to be 13 numbers. Try again.")
+
+    return is_valid
+
 # Lists all books and asks for the user to pick one to do an action
 def query_books(question: str) -> str:
     book_titles = []
@@ -74,18 +107,7 @@ def add() -> None:
         while (not is_isbn_valid):
             info["isbn"] = input("ISBN: ")
 
-            isbn = info["isbn"]
-
-            isbn_numbers = isbn.split("-")
-            isbn_len = 0
-
-            for num in isbn_numbers:
-                isbn_len += len(num)
-
-            if isbn_len == 13:
-                is_isbn_valid = True
-            else:
-                print("ISBN has to be 13 numbers. Try again.")
+            is_isbn_valid = validate_isbn(info["isbn"])
 
         while not is_status_valid:
             info["status"] = input("Status (done/reading/want to read): ")
