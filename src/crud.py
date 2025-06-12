@@ -129,7 +129,7 @@ def add() -> None:
         while not is_status_valid:
             info["status"] = input("Status (done/reading/want to read): ")
 
-            status = info["status"]
+            status = info["status"].lower()
 
             if status == "done" or status == "reading" or status == "want to read":
                 is_status_valid = True
