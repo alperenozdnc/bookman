@@ -219,7 +219,9 @@ def delete(isbn: str) -> None:
 @click.argument("isbn", required=False)
 def list(isbn: str) -> None:
     is_user_done = False
+
     while not is_user_done:
+        is_data_manipulated = False
         info = dict(zip(properties, ["" for _ in range(0, len(properties) - 1)]))
         os.system("clear")
         filename_to_view = f"{isbn}.json" if isbn else query_books("What book to view?")
@@ -298,8 +300,7 @@ def list(isbn: str) -> None:
 
             info["status"] = selected_status
 
-            with open(os.path.join(const.data_dir, filename_to_view), "w") as file:
-                file.write(json.dumps(info))
+            is_data_manipulated = True
         elif selected == "Set date":
             while True:
                 if info["date"]:
@@ -313,19 +314,20 @@ def list(isbn: str) -> None:
 
                 break
 
-            with open(os.path.join(const.data_dir, filename_to_view), "w") as file:
-                file.write(json.dumps(info))
+            is_data_manipulated = True
         elif selected == "Set rating":
             rating = input("What's the rating out of 10? ")
             info["rating"] = rating
 
-            with open(os.path.join(const.data_dir, filename_to_view), "w") as file:
-                file.write(json.dumps(info))
+            is_data_manipulated = True
         else:
             continue
 
-        is_user_done = True
+        if is_data_manipulated:
+            with open(os.path.join(const.data_dir, filename_to_view), "w") as file:
+                file.write(json.dumps(info))
 
+        is_user_done = True
 
 @click.command(help="Cleans all recorded books.")
 def clean() -> None:
