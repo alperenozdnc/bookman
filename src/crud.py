@@ -4,6 +4,8 @@ import click
 import const
 import inquirer
 
+from prompt_toolkit import prompt
+from datetime import date 
 from dateutil.parser import parse, ParserError
 from rich.console import Console
 from rich.table import Table
@@ -247,6 +249,7 @@ def list(isbn: str) -> None:
                             [
                                 "Change status",
                                 "Delete",
+                                "Set date" if info["status"] == "done" else None,
                                 "Set rating" if info["status"] == "done" else None,
                                 "Go back to menu",
                             ],
@@ -294,6 +297,21 @@ def list(isbn: str) -> None:
                 continue
 
             info["status"] = selected_status
+
+            with open(os.path.join(const.data_dir, filename_to_view), "w") as file:
+                file.write(json.dumps(info))
+        elif selected == "Set date":
+            while True:
+                if info["date"]:
+                    info["date"] = prompt("Date of reading [DD/MM/YY]? ", default=info["date"])
+                else:
+                    info["date"] = prompt("Date of reading [DD/MM/YY] (defaults to today)? ", default=date.today().strftime("%d/%m/%Y"))
+
+                if not is_valid_date(info["date"]):
+                    print("Invalid date. Try again.")
+                    continue
+
+                break
 
             with open(os.path.join(const.data_dir, filename_to_view), "w") as file:
                 file.write(json.dumps(info))
