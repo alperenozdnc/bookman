@@ -6,6 +6,7 @@ markdown-it-py==3.0.0
 mdurl==0.1.2
 prompt-tool-kit==1.0.14
 Pygments==2.19.1
+python-dateutil==2.9.0.post0
 readchar==4.2.1
 regex==2024.11.6
 rich==14.0.0
