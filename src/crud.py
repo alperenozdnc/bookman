@@ -4,12 +4,21 @@ import click
 import const
 import inquirer
 
+from dateutil.parser import parse, ParserError
 from rich.console import Console
 from rich.table import Table
 
 console = Console()
 properties = ["title", "author", "pages", "isbn", "status", "rating"]
 
+def is_valid_date(date):
+    if not date:
+        return False
+    try:
+        parse(date)
+        return True
+    except ParserError:
+        return False
 
 def is_string_float(s):
     try:
