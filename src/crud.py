@@ -10,6 +10,12 @@ from rich.table import Table
 console = Console()
 properties = ["title", "author", "pages", "isbn", "status", "rating"]
 
+def is_string_float(s):
+    try:
+        return '.' in s or 'e' in s.lower() and float(s)
+    except ValueError:
+        return False
+
 def validate_isbn(isbn: str) -> bool:
     is_valid = False
 
@@ -99,10 +105,21 @@ def add() -> None:
     def acquire_input() -> None:
         is_isbn_valid = False
         is_status_valid = False
+        is_rating_valid = False
+        is_page_count_valid = False
 
         info["title"] = input("Title: ")
         info["author"] = input("Author: ")
-        info["pages"] = input("Page count: ")
+
+        while not is_page_count_valid:
+            info["pages"] = input("Page count: ")
+
+            page_count: str = info["pages"]
+
+            if not page_count.isdigit():
+                print("Page count has to be a number. Try again.")
+            else:
+                is_page_count_valid = True
 
         while (not is_isbn_valid):
             info["isbn"] = input("ISBN: ")
@@ -122,8 +139,23 @@ def add() -> None:
                 continue
 
         if info["status"] == "done":
-            info["rating"] = input("Rating (x/10): ")
+            while not is_rating_valid:
+                info["rating"] = input("Rating (x/10): ")
 
+                rating: str = info["rating"]
+
+                if not rating.isdigit() and not is_string_float(rating):
+                    print("Rating has to be a digit or a float. Try again.")
+                    continue
+                else:
+                    rating_value = int(rating) if rating.isdigit() else float(rating)
+
+                    if rating_value > 10:
+                        print("Rating can't be bigger than 10. Try again.")
+                    elif rating_value < 0:
+                        print("Rating can't be smaller than 0. Try again.")
+                    else:
+                        is_rating_valid = True
 
     is_input_valid = False
 
