@@ -9,7 +9,7 @@ from rich.console import Console
 from rich.table import Table
 
 console = Console()
-properties = ["title", "author", "pages", "isbn", "status", "rating"]
+properties = ["title", "author", "pages", "isbn", "status", "date", "rating"]
 
 def is_valid_date(date):
     if not date:
@@ -97,6 +97,9 @@ def print_book_info(info) -> None:
         if info["status"] != "done" and property == "rating":
             continue
 
+        if info["status"] != "done" and property == "date":
+            continue
+
         table.add_column(
             property.capitalize(), style=f"{"cyan" if idx % 2 == 0 else "magenta"}"
         )
@@ -108,7 +111,7 @@ def print_book_info(info) -> None:
             *(
                 filter(
                     None,
-                    [info[key] if key != "rating" else None for key in info.keys()],
+                    [info[key] if key != "rating" or key != "date" else None for key in info.keys()],
                 )
             )
         )
@@ -123,6 +126,7 @@ def add() -> None:
     def acquire_input() -> None:
         is_isbn_valid = False
         is_status_valid = False
+        is_date_valid = False
         is_rating_valid = False
         is_page_count_valid = False
 
@@ -157,6 +161,15 @@ def add() -> None:
                 continue
 
         if info["status"] == "done":
+            while not is_date_valid:
+                info["date"] = input("Date of reading (DD/MM/YYYY or MM/DD/YYYY): ")
+
+                if not is_valid_date(info["date"]):
+                    print("Invalid date. Try again.")
+                    continue
+
+                is_date_valid = True
+
             while not is_rating_valid:
                 info["rating"] = input("Rating (x/10): ")
 
@@ -204,17 +217,23 @@ def delete(isbn: str) -> None:
 @click.argument("isbn", required=False)
 def list(isbn: str) -> None:
     is_user_done = False
-    info = dict(zip(properties, len(properties) * ""))
-
     while not is_user_done:
+        info = dict(zip(properties, ["" for _ in range(0, len(properties) - 1)]))
         os.system("clear")
         filename_to_view = f"{isbn}.json" if isbn else query_books("What book to view?")
+
+        print(info)
 
         with open(os.path.join(const.data_dir, filename_to_view), "r") as file:
             json_data = json.load(file)
 
             for property in properties:
-                info[property] = json_data[property]
+                if info["status"] != "done":
+                    if property == "date" or property == "rating":
+                        continue
+
+                if property in json_data:
+                    info[property] = json_data[property]
 
         os.system("clear")
         print_book_info(info)
