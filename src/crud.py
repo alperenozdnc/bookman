@@ -337,3 +337,7 @@ def clean() -> None:
         os.remove(os.path.join(const.data_dir, file))
 
     print("All data cleaned successfully.")
+
+@click.command(help="Shows statistics like amount of books read, ratings, etc. over a month.")
+def stats() -> None:
+    pass

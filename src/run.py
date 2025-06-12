@@ -20,6 +20,7 @@ def cli() -> None:
 cli.add_command(crud.add)
 cli.add_command(crud.delete)
 cli.add_command(crud.list)
+cli.add_command(crud.stats)
 cli.add_command(crud.clean)
 
 if __name__ == "__main__":
