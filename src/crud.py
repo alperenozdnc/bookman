@@ -2,7 +2,7 @@ import os
 import json
 import click
 import const
-import inquirer 
+import inquirer
 
 from rich.console import Console
 from rich.table import Table
@@ -10,11 +10,13 @@ from rich.table import Table
 console = Console()
 properties = ["title", "author", "pages", "isbn", "status", "rating"]
 
+
 def is_string_float(s):
     try:
-        return '.' in s or 'e' in s.lower() and float(s)
+        return "." in s or "e" in s.lower() and float(s)
     except ValueError:
         return False
+
 
 def validate_isbn(isbn: str) -> bool:
     is_valid = False
@@ -35,7 +37,6 @@ def validate_isbn(isbn: str) -> bool:
             print("Two dashes can't be next to eachother. Please try again.")
             return False
 
-
     isbn_numbers = isbn.split("-")
     isbn_len = 0
 
@@ -49,6 +50,7 @@ def validate_isbn(isbn: str) -> bool:
 
     return is_valid
 
+
 # Lists all books and asks for the user to pick one to do an action
 def query_books(question: str) -> str:
     book_titles = []
@@ -61,13 +63,13 @@ def query_books(question: str) -> str:
 
             book_titles.append(json_data["title"])
 
-    answer = inquirer.prompt([
-        inquirer.List(
-            "selected",
-            message=question,
-            choices=[*book_titles, "Cancel"]
-        ),
-    ])
+    answer = inquirer.prompt(
+        [
+            inquirer.List(
+                "selected", message=question, choices=[*book_titles, "Cancel"]
+            ),
+        ]
+    )
 
     if answer is None or answer["selected"] == "Cancel":
         print("Aborting...")
@@ -78,6 +80,7 @@ def query_books(question: str) -> str:
 
     return [filename for filename in os.listdir(const.data_dir)][book_idx]
 
+
 def print_book_info(info) -> None:
     table = Table(title="Book Information")
 
@@ -85,18 +88,24 @@ def print_book_info(info) -> None:
         if info["status"] != "done" and property == "rating":
             continue
 
-        table.add_column(property.capitalize(), style=f"{"cyan" if idx % 2 == 0 else "magenta"}")
-    
-    if info["status"] == "done":
-        table.add_row(
-            *[info[key] for key in info.keys()]
+        table.add_column(
+            property.capitalize(), style=f"{"cyan" if idx % 2 == 0 else "magenta"}"
         )
+
+    if info["status"] == "done":
+        table.add_row(*[info[key] for key in info.keys()])
     else:
         table.add_row(
-            *(filter(None, [info[key] if key != "rating" else None for key in info.keys()]))
+            *(
+                filter(
+                    None,
+                    [info[key] if key != "rating" else None for key in info.keys()],
+                )
+            )
         )
 
     console.print(table)
+
 
 @click.command(help="Add a book with properties like its rating, author, pages, etc.")
 def add() -> None:
@@ -121,7 +130,7 @@ def add() -> None:
             else:
                 is_page_count_valid = True
 
-        while (not is_isbn_valid):
+        while not is_isbn_valid:
             info["isbn"] = input("ISBN: ")
 
             is_isbn_valid = validate_isbn(info["isbn"])
@@ -161,7 +170,7 @@ def add() -> None:
 
     while not is_input_valid:
         acquire_input()
-    
+
         print_book_info(info)
 
         is_input_valid = click.confirm("Is the information correct? ")
@@ -201,13 +210,25 @@ def list(isbn: str) -> None:
         os.system("clear")
         print_book_info(info)
 
-        answer = inquirer.prompt([
-            inquirer.List(
-                "selected",
-                message="What do you want to do?",
-                choices=[*filter(None, ["Change status", "Delete", "Set rating" if info["status"] == "done" else None, "Go back to menu"])]
-            )
-        ])
+        answer = inquirer.prompt(
+            [
+                inquirer.List(
+                    "selected",
+                    message="What do you want to do?",
+                    choices=[
+                        *filter(
+                            None,
+                            [
+                                "Change status",
+                                "Delete",
+                                "Set rating" if info["status"] == "done" else None,
+                                "Go back to menu",
+                            ],
+                        )
+                    ],
+                )
+            ]
+        )
 
         if answer is None:
             continue
@@ -219,18 +240,24 @@ def list(isbn: str) -> None:
 
             print(f"Successfully deleted book.")
         elif selected == "Change status":
-            answer_status = inquirer.prompt([
-                inquirer.List(
-                    "selected",
-                    message="Set status",
-                    choices=[
-                        *filter(
-                            None,
-                            [status if status.lower() != info["status"] else None for status in ["Done", "Reading", "Want to read"]
-                        ]), "Cancel"
-                    ]
-                ),
-            ])
+            answer_status = inquirer.prompt(
+                [
+                    inquirer.List(
+                        "selected",
+                        message="Set status",
+                        choices=[
+                            *filter(
+                                None,
+                                [
+                                    status if status.lower() != info["status"] else None
+                                    for status in ["Done", "Reading", "Want to read"]
+                                ],
+                            ),
+                            "Cancel",
+                        ],
+                    ),
+                ]
+            )
 
             if answer_status is None:
                 continue
@@ -254,6 +281,7 @@ def list(isbn: str) -> None:
             continue
 
         is_user_done = True
+
 
 @click.command(help="Cleans all recorded books.")
 def clean() -> None:

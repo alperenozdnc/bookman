@@ -3,6 +3,7 @@ import click
 import crud
 import const
 
+
 @click.group()
 def cli() -> None:
     try:
@@ -14,6 +15,7 @@ def cli() -> None:
         print(f"Permission denied: Unable to create '{const.data_dir}'.")
     except Exception as e:
         print(f"An error occurred trying to create data directory: {e}")
+
 
 cli.add_command(crud.add)
 cli.add_command(crud.delete)
