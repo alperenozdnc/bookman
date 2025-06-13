@@ -1,4 +1,4 @@
-# 📚 bookman — a cli reading tracker
+# 📚 bookman — a light book management cli 
 
 ![python](https://img.shields.io/badge/python-3.7%2B-blue?style=flat-square)
 ![license](https://img.shields.io/badge/license-GPLv3-blue?style=flat-square)
