@@ -123,7 +123,7 @@ def print_book_info(info) -> None:
 
 @click.command(help="Add a book with properties like its rating, author, pages, etc.")
 def add() -> None:
-    info = dict(zip(properties, len(properties) * ""))
+    info = dict(zip(properties, [""] * len(properties)))
 
     def acquire_input() -> None:
         is_isbn_valid = False
