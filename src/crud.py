@@ -341,10 +341,6 @@ def clean() -> None:
 
 @click.command(help="Shows statistics like amount of books read, ratings, etc. over a month.")
 def stats() -> None:
-    from rich.console import Console
-    from rich.table import Table
-    from rich.panel import Panel
-
     console = Console()
     book_datas = os.listdir(const.data_dir)
 
