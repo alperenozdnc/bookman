@@ -382,11 +382,11 @@ def stats() -> None:
 
     average_rating = average_rating / total_books_read
     
-    print("-----THIS MONTH------")
+    print("----- THIS MONTH ------")
     print("Total books read:", total_books_read)
     print("Total pages you read:", total_pages_read)
-    print("Average rating of books you read:", average_rating)
-    print("---------------------", "\n")
+    print("Avg. rating:", average_rating)
+    print("-----------------------", "\n")
 
     print("Total books currently being read:", total_books_being_read)
     print("Total books you want to read:", total_books_to_be_read)
