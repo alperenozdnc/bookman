@@ -3,6 +3,7 @@ import json
 import click
 import const
 import inquirer
+import datetime
 
 from prompt_toolkit import prompt
 from datetime import date 
@@ -355,10 +356,18 @@ def stats() -> None:
     for book_file in book_datas:
         with open(os.path.join(const.data_dir, book_file), "r") as file:
             info = json.load(file)
-            
+        
             status = info["status"]
 
             if status == "done":
+                book_date = parse(info["date"])
+
+                now = parse(date.today().strftime("%d/%m/%Y"))
+                delta = now - book_date
+
+                if delta.days > 30:
+                    continue
+
                 total_books_read += 1
                 total_pages_read += int(info["pages"])
 
@@ -373,8 +382,11 @@ def stats() -> None:
 
     average_rating = average_rating / total_books_read
     
+    print("-----THIS MONTH------")
     print("Total books read:", total_books_read)
     print("Total pages you read:", total_pages_read)
-    print("Average rating of books you read:", average_rating, "\n")
+    print("Average rating of books you read:", average_rating)
+    print("---------------------", "\n")
+
     print("Total books currently being read:", total_books_being_read)
     print("Total books you want to read:", total_books_to_be_read)
