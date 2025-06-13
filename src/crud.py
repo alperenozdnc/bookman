@@ -341,52 +341,70 @@ def clean() -> None:
 
 @click.command(help="Shows statistics like amount of books read, ratings, etc. over a month.")
 def stats() -> None:
+    from rich.console import Console
+    from rich.table import Table
+    from rich.panel import Panel
+
+    console = Console()
     book_datas = os.listdir(const.data_dir)
 
-    if (len(book_datas) == 0):
-        print("No stats to view.")
+    if len(book_datas) == 0:
+        console.print("[bold red]No stats to view.[/bold red]")
         return
 
     total_books_read = 0
     total_books_being_read = 0
     total_books_to_be_read = 0
     total_pages_read = 0
-    average_rating = 0
-    
+    average_rating_total = 0
+
     for book_file in book_datas:
         with open(os.path.join(const.data_dir, book_file), "r") as file:
             info = json.load(file)
         
-            status = info["status"]
+        status = info.get("status", "").lower()
 
-            if status == "done":
-                book_date = parse(info["date"])
-
-                now = parse(date.today().strftime("%d/%m/%Y"))
+        if status == "done":
+            try:
+                book_date = parse(info.get("date", ""), dayfirst=True)
+                now = parse(date.today().strftime("%d/%m/%Y"), dayfirst=True)
                 delta = now - book_date
+            except ParserError:
+                continue
 
-                if delta.days > 30:
-                    continue
+            if delta.days > 30:
+                continue
 
-                total_books_read += 1
-                total_pages_read += int(info["pages"])
+            total_books_read += 1
+            total_pages_read += int(info.get("pages", 0))
+            rating = info.get("rating", "0")
 
-                rating = info["rating"]
-                
-                average_rating += float(rating) if is_string_float(rating) else int(rating)
+            average_rating_total += float(rating) if is_string_float(rating) else int(rating)
 
-            elif status == "reading":
-                total_books_being_read += 1
-            else:
-                total_books_to_be_read += 1
+        elif status == "reading":
+            total_books_being_read += 1
+        elif status == "want to read":
+            total_books_to_be_read += 1
 
-    average_rating = average_rating / total_books_read
-    
-    print("----- THIS MONTH ------")
-    print("Total books read:", total_books_read)
-    print("Total pages you read:", total_pages_read)
-    print("Avg. rating:", average_rating)
-    print("-----------------------", "\n")
+    average_rating = (average_rating_total / total_books_read) if total_books_read > 0 else 0
 
-    print("Total books currently being read:", total_books_being_read)
-    print("Total books you want to read:", total_books_to_be_read)
+    # Monthly stats table
+    month_stats = Table(title="[bold cyan]Stats for This Month[/bold cyan]", show_lines=True)
+    month_stats.add_column("Metric", style="magenta bold")
+    month_stats.add_column("Value", style="green")
+
+    month_stats.add_row("Books Read", str(total_books_read))
+    month_stats.add_row("Pages Read", str(total_pages_read))
+    month_stats.add_row("Average Rating", f"{average_rating:.2f}" if total_books_read > 0 else "N/A")
+
+    # Overall stats table
+    overall_stats = Table(title="[bold cyan]Overall Reading Status[/bold cyan]", show_lines=True)
+    overall_stats.add_column("Status", style="magenta bold")
+    overall_stats.add_column("Count", style="green")
+
+    overall_stats.add_row("Currently Reading", str(total_books_being_read))
+    overall_stats.add_row("Want to Read", str(total_books_to_be_read))
+
+    console.print(month_stats)
+    console.print(overall_stats)
+
