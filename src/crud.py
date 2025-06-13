@@ -3,7 +3,6 @@ import json
 import click
 import const
 import inquirer
-import datetime
 
 from prompt_toolkit import prompt
 from datetime import date 
