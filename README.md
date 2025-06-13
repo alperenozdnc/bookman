@@ -39,6 +39,11 @@ or just:
 pip install click inquirer prompt_toolkit python-dateutil rich
 ```
 
+### 3. install bookman as a command-line-tool
+```bash
+pip install .
+```
+
 ---
 
 ## 🧠 where your books live
@@ -58,7 +63,7 @@ each file is named with the book's isbn, like `978-3-16-148410-0.json`.
 run the app with:
 
 ```bash
-python run.py <command>
+bookman <command>
 ```
 
 ### ➕ `add`
@@ -66,7 +71,7 @@ python run.py <command>
 add a book interactively.
 
 ```bash
-python run.py add
+bookman add
 ```
 
 ### 📋 `list [isbn]`
@@ -74,7 +79,7 @@ python run.py add
 view/edit a book by isbn. if you don’t pass one, you’ll be asked.
 
 ```bash
-python run.py list
+bookman list
 ```
 
 you can:
@@ -88,7 +93,7 @@ you can:
 delete by isbn or pick from a list.
 
 ```bash
-python run.py delete
+bookman delete
 ```
 
 ### 🔄 `clean`
@@ -96,7 +101,7 @@ python run.py delete
 delete *all* books.
 
 ```bash
-python run.py clean
+bookman clean
 ```
 
 ⚠️ can’t undo this.
@@ -106,7 +111,7 @@ python run.py clean
 show stats for the last 30 days + overall status.
 
 ```bash
-python run.py stats
+bookman stats
 ```
 
 ---
