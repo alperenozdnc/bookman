@@ -1,0 +1,9 @@
+LICENSE
+README.md
+setup.py
+src/bookman.egg-info/PKG-INFO
+src/bookman.egg-info/SOURCES.txt
+src/bookman.egg-info/dependency_links.txt
+src/bookman.egg-info/entry_points.txt
+src/bookman.egg-info/requires.txt
+src/bookman.egg-info/top_level.txt
