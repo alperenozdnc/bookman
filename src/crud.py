@@ -112,7 +112,7 @@ def print_book_info(info) -> None:
         if info["status"] != "done" and property == "rating":
             continue
 
-        if info["status"] != "done" and property == "date" and info["status"] != "reading" and property == "date":
+        if info["status"] == "want to read" and property == "date":
             continue
 
         if info["status"] != "reading" and property == "current_page":
@@ -271,9 +271,11 @@ def list(isbn: str) -> None:
             json_data = json.load(file)
 
             for property in properties:
-                if info["status"] != "done":
-                    if property == "date" or property == "rating":
-                        continue
+                if info["status"] == "want to read" and property == "date":
+                    continue
+
+                if info["status"] != "done" and property == "rating":
+                    continue
 
                 if property in json_data:
                     info[property] = json_data[property]
