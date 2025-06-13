@@ -340,4 +340,41 @@ def clean() -> None:
 
 @click.command(help="Shows statistics like amount of books read, ratings, etc. over a month.")
 def stats() -> None:
-    pass
+    book_datas = os.listdir(const.data_dir)
+
+    if (len(book_datas) == 0):
+        print("No stats to view.")
+        return
+
+    total_books_read = 0
+    total_books_being_read = 0
+    total_books_to_be_read = 0
+    total_pages_read = 0
+    average_rating = 0
+    
+    for book_file in book_datas:
+        with open(os.path.join(const.data_dir, book_file), "r") as file:
+            info = json.load(file)
+            
+            status = info["status"]
+
+            if status == "done":
+                total_books_read += 1
+                total_pages_read += int(info["pages"])
+
+                rating = info["rating"]
+                
+                average_rating += float(rating) if is_string_float(rating) else int(rating)
+
+            elif status == "reading":
+                total_books_being_read += 1
+            else:
+                total_books_to_be_read += 1
+
+    average_rating = average_rating / total_books_read
+    
+    print("Total books read:", total_books_read)
+    print("Total pages you read:", total_pages_read)
+    print("Average rating of books you read:", average_rating, "\n")
+    print("Total books currently being read:", total_books_being_read)
+    print("Total books you want to read:", total_books_to_be_read)
