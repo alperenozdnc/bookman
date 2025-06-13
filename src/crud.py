@@ -11,7 +11,7 @@ from rich.console import Console
 from rich.table import Table
 
 console = Console()
-properties = ["title", "author", "pages", "isbn", "status", "date", "rating"]
+properties = ["title", "author", "pages", "isbn", "status", "current_page", "date", "rating"]
 
 def is_valid_date(date):
     if not date:
@@ -91,6 +91,19 @@ def query_books(question: str) -> str:
 
     return [filename for filename in os.listdir(const.data_dir)][book_idx]
 
+def is_valid_current_page(current_page: str, total_pages: int) -> bool:
+    is_valid = False
+
+    if not current_page.isdigit():
+        print("Current page has to be a number. Try again.")
+    elif int(current_page) > total_pages:
+        print("Current page can't be higher than total page count. Try again.")
+    elif int(current_page) == total_pages:
+        print("Why not just mark book as 'done' if you are on the last page? Try again or <C-c> to cancel.")
+    else:
+        is_valid = True
+
+    return is_valid
 
 def print_book_info(info) -> None:
     table = Table(title="Book Information")
@@ -99,7 +112,10 @@ def print_book_info(info) -> None:
         if info["status"] != "done" and property == "rating":
             continue
 
-        if info["status"] != "done" and property == "date":
+        if info["status"] != "done" and property == "date" and info["status"] != "reading" and property == "date":
+            continue
+
+        if info["status"] != "reading" and property == "current_page":
             continue
 
         table.add_column(
@@ -107,13 +123,29 @@ def print_book_info(info) -> None:
         )
 
     if info["status"] == "done":
-        table.add_row(*[info[key] for key in info.keys()])
+        table.add_row(
+            *(
+                filter(
+                    None,
+                    [info[key] if key != "current_page" else None for key in info.keys()],
+                )
+            )
+        )
+    elif info["status"] == "reading":
+        table.add_row(
+            *(
+                filter(
+                    None,
+                    [info[key] if key != "rating" else None for key in info.keys()],
+                )
+            )
+        )
     else:
         table.add_row(
             *(
                 filter(
                     None,
-                    [info[key] if key != "rating" or key != "date" else None for key in info.keys()],
+                    [info[key] if key != "rating" and key != "date" and key != "current_page" else None for key in info.keys()],
                 )
             )
         )
@@ -161,6 +193,15 @@ def add() -> None:
             else:
                 print("Invalid status. Please enter again.")
                 continue
+
+        if info["status"] == "reading":
+            while True:
+                info["current_page"] = input("What page are you on: ")
+
+                current_page: str = info["current_page"]
+
+                if is_valid_current_page(current_page, int(info["pages"])):
+                    break
 
         if info["status"] == "done":
             while not is_date_valid:
@@ -251,7 +292,8 @@ def list(isbn: str) -> None:
                             [
                                 "Change status",
                                 "Delete",
-                                "Set date" if info["status"] == "done" else None,
+                                "Set date" if info["status"] == "done" or info["status"] == "reading" else None,
+                                "Set current page" if info["status"] == "reading" else None,
                                 "Set rating" if info["status"] == "done" else None,
                                 "Go back to menu",
                             ],
@@ -299,6 +341,16 @@ def list(isbn: str) -> None:
                 continue
 
             info["status"] = selected_status
+
+            is_data_manipulated = True
+        elif selected == "Set current page":
+            while True:
+                info["current_page"] = prompt("What page are you on? ", default=info["current_page"] if info["current_page"] else "0")
+
+                if not is_valid_current_page(info["current_page"], int(info["pages"])):
+                    continue
+
+                break
 
             is_data_manipulated = True
         elif selected == "Set date":
@@ -375,9 +427,19 @@ def stats() -> None:
             rating = info.get("rating", "0")
 
             average_rating_total += float(rating) if is_string_float(rating) else int(rating)
-
         elif status == "reading":
+            try:
+                book_date = parse(info.get("date", ""), dayfirst=True)
+                now = parse(date.today().strftime("%d/%m/%Y"), dayfirst=True)
+                delta = now - book_date
+            except ParserError:
+                continue
+
+            if delta.days > 30:
+                continue
+
             total_books_being_read += 1
+            total_pages_read += int(info["current_page"]) if info["current_page"] else 0
         elif status == "want to read":
             total_books_to_be_read += 1
 
@@ -390,14 +452,14 @@ def stats() -> None:
 
     month_stats.add_row("Books Read", str(total_books_read))
     month_stats.add_row("Pages Read", str(total_pages_read))
+    month_stats.add_row("Currently Reading", str(total_books_being_read))
     month_stats.add_row("Average Rating", f"{average_rating:.2f}" if total_books_read > 0 else "N/A")
 
     # Overall stats table
     overall_stats = Table(title="[bold cyan]Overall Reading Status[/bold cyan]", show_lines=True)
+
     overall_stats.add_column("Status", style="magenta bold")
     overall_stats.add_column("Count", style="green")
-
-    overall_stats.add_row("Currently Reading", str(total_books_being_read))
     overall_stats.add_row("Want to Read", str(total_books_to_be_read))
 
     console.print(month_stats)
