@@ -1,39 +1,39 @@
-# 📚 Bookman — A CLI Reading Tracker
+# 📚 bookman — a cli reading tracker
 
-![Python Version](https://img.shields.io/badge/python-3.7%2B-blue?style=flat-square)
-![License](https://img.shields.io/badge/license-MIT-green?style=flat-square)
-![Platform](https://img.shields.io/badge/platform-CLI-informational?style=flat-square)
+![python](https://img.shields.io/badge/python-3.7%2B-blue?style=flat-square)
+![license](https://img.shields.io/badge/license-GPLv3-blue?style=flat-square)
+![platform](https://img.shields.io/badge/platform-terminal-lightgrey?style=flat-square)
 
-> Track your reading list from the terminal. Add, update, delete, and view books — with interactive prompts, validation, and rich stats.
-
----
-
-## 🚀 Features
-
-- 📖 Add books with metadata like author, ISBN, status, rating, etc.
-- 🔄 Update reading progress interactively
-- 🗑 Delete books or wipe your entire list
-- 📊 View beautiful monthly statistics (pages read, ratings, etc.)
-- 💾 Lightweight: stores data in `.json` files
+> track your reading list from the terminal. add, update, delete, and view books — with interactive prompts, validation, and decent stats.
 
 ---
 
-## 📦 Installation
+## 🚀 features
 
-### 1. Clone the repository
+- add books with title, author, pages, isbn, status, etc.
+- update reading progress with simple prompts
+- delete books (or wipe everything if you're feeling wild)
+- monthly stats: pages read, books done, avg rating
+- all local, all `.json` — no databases
+
+---
+
+## 📦 installation
+
+### 1. clone the repo
 
 ```bash
 git clone https://github.com/alperenozdnc/bookman.git
 cd bookman
 ```
 
-### 2. Install dependencies
+### 2. install dependencies
 
 ```bash
 pip install -r requirements.txt
 ```
 
-Or manually:
+or just:
 
 ```bash
 pip install click inquirer prompt_toolkit python-dateutil rich
@@ -41,21 +41,21 @@ pip install click inquirer prompt_toolkit python-dateutil rich
 
 ---
 
-## 🧠 Book Data Format
+## 🧠 where your books live
 
-Bookman stores each book in:
+bookman stores each book in:
 
 ```bash
 ~/.local/bookman/
 ```
 
-Each file is named after the book’s ISBN (`<isbn>.json`).
+each file is named with the book's isbn, like `978-3-16-148410-0.json`.
 
 ---
 
-## 🛠️ Commands
+## 🛠️ commands
 
-Run the app with:
+run the app with:
 
 ```bash
 python run.py <command>
@@ -63,7 +63,7 @@ python run.py <command>
 
 ### ➕ `add`
 
-Interactively add a new book.
+add a book interactively.
 
 ```bash
 python run.py add
@@ -71,21 +71,21 @@ python run.py add
 
 ### 📋 `list [isbn]`
 
-View and edit a book by ISBN. If omitted, a list will be shown.
+view/edit a book by isbn. if you don’t pass one, you’ll be asked.
 
 ```bash
 python run.py list
 ```
 
-Edit options:
-- Change status
-- Update current page
-- Set reading date
-- Set rating
+you can:
+- change status
+- update current page
+- set reading date
+- add rating
 
 ### 🗑 `delete [isbn]`
 
-Delete a book by ISBN or choose interactively.
+delete by isbn or pick from a list.
 
 ```bash
 python run.py delete
@@ -93,17 +93,17 @@ python run.py delete
 
 ### 🔄 `clean`
 
-Delete all book entries.
+delete *all* books.
 
 ```bash
 python run.py clean
 ```
 
-⚠️ This action is irreversible.
+⚠️ can’t undo this.
 
 ### 📈 `stats`
 
-Show stats for the past month and overall book status.
+show stats for the last 30 days + overall status.
 
 ```bash
 python run.py stats
@@ -111,37 +111,38 @@ python run.py stats
 
 ---
 
-## 📊 Example Output
+## 📊 example output
 
 ```text
-📊 Stats for This Month
+📊 stats for this month
 ------------------------
-Books Read         | 3
-Pages Read         | 850
-Currently Reading  | 2
-Average Rating     | 8.33
+books read         | 3
+pages read         | 850
+currently reading  | 2
+average rating     | 8.33
 
-📘 Overall Reading Status
+📘 overall status
 -------------------------
-Want to Read       | 4
+want to read       | 4
 ```
 
 ---
 
-## ✅ ISBN & Input Validation
+## ✅ input checks
 
-- ISBN must be 13 digits (hyphens allowed, validated format)
-- Page count, current page, rating, and dates are all validated
-- Supports both `DD/MM/YYYY` and `MM/DD/YYYY` formats
+- isbn must be 13 digits (hyphens ok)
+- current page can’t go past total pages
+- rating: 0–10, supports floats
+- dates work in `dd/mm/yyyy` or `mm/dd/yyyy`
 
 ---
 
-## 📁 Example Data File
+## 📁 sample book file
 
 ```json
 {
   "title": "1984",
-  "author": "George Orwell",
+  "author": "george orwell",
   "pages": "328",
   "isbn": "978-0-452-28423-4",
   "status": "done",
@@ -152,23 +153,23 @@ Want to Read       | 4
 
 ---
 
-## 🤝 Contributing
+## 🤝 contributing
 
-PRs, bug reports, and feature suggestions are welcome!
+totally open to pull requests, fixes, features, whatever.
 
-1. Fork the repo
-2. Create your branch (`git checkout -b feature/foo`)
-3. Commit and push (`git commit -am 'Add foo' && git push`)
-4. Open a Pull Request
-
----
-
-## 📄 License
-
-Licensed under the MIT License — see [`LICENSE`](./LICENSE) for details.
+1. fork it
+2. make a branch (`git checkout -b cool-stuff`)
+3. commit and push (`git commit -am 'do something' && git push`)
+4. open a pr
 
 ---
 
-## 🌟 Star this project!
+## 📄 license
 
-If you find Bookman useful, consider giving it a ⭐ on [GitHub](https://github.com/alperenozdnc/bookman) — it really helps!
+bookman is licensed under the gplv3. see [`LICENSE`](./LICENSE).
+
+---
+
+## ⭐ show some love
+
+if you like this project, toss it a star on [github](https://github.com/alperenozdnc/bookman). thanks!
